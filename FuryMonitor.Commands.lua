@@ -27,9 +27,9 @@ function FuryMonitor.Commands.SlashCommandHandler(cmd)
 					-- Collect arguments
 					local args = {};
 					while true do
-						s, e = string.find(cmd, "[%a%d.\\/-]+", e + 1);
+						s, e = string.find(cmd, "[^%s]+", e + 1);
 						if not s then
-							do break end;
+							break;
 						end
 						args[#args + 1] = string.sub(cmd, s, e);
 					end
@@ -42,11 +42,11 @@ function FuryMonitor.Commands.SlashCommandHandler(cmd)
 				FuryMonitor.Main:GetInstance():PrintMessage(
 					"The command you specified could not be found."
 				);	
-				do break end;
+				break;
 			end
 		else
 			FuryMonitor.Commands.SlashCommandHandler_ShowUsage(goodText, current);
-			do break end;
+			break;
 		end
 	end
 end
@@ -56,20 +56,21 @@ end
 		while true do
 			if #args == 0 then
 				result = func();
-				do break end;
+				break;
 			elseif #args == 1 then
 				result = func(args[1]);
-				do break end;
+				break;
 			elseif #args == 2 then
 				result = func(args[1], args[2]);
-				do break end;
+				break;
 			elseif #args == 3 then
 				result = func(args[1], args[2], args[3]);
-				do break end;
+				break;
 			elseif #args == 4 then
 				result = func(args[1], args[2], args[3], args[4]);
-				do break end;
+				break;
 			end	
+			break;
 			-- Add additional cases here to support more arguments
 		end
 		if not result then

@@ -731,7 +731,8 @@ function FuryMonitor.Main:OnLoad_RegisterEvents()
 	self:GetFrame():SetScript(
 		"OnEvent",
 		function(frame, event)
-			FuryMonitor.Main:GetInstance().Events[event](FuryMonitor.Main:GetInstance());
+			local fm = FuryMonitor.Main:GetInstance();
+			fm.Events[event](fm);
 		end
 	);	
 	
@@ -762,7 +763,7 @@ function FuryMonitor.Main:OnSpellCast()
 
 	self:SetRotationStabilized(false);
 	local spellName = arg2;
-	local ability = self:GetAbilityByName(arg2);
+	local ability = self:GetAbilityByName(spellName);
 	if ability then
 		FuryMonitor.Util.UpdateTime();
 		ability:Used();

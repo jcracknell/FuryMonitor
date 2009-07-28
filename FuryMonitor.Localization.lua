@@ -46,23 +46,23 @@ FuryMonitor.Localization.Locales = {
 		["Two-Handed"] =						"Zweihand",
 		["One-Handed"] =						"Einhand",
 		["Dagger"] =							"Dolch",
-	
+		
 		-- Talents
 		["Two-Handed Weapon Specialization"] =	"Zweihandwaffen-Spezialisierung",
-		["Dual Wield Specialization"] =			"Beidhändigkeits-Spezialisierung",
+		["Dual Wield Specialization"] =			"Beidh\195\164ndigkeits-Spezialisierung",
 		["Hamstring"] =							"Kniesehne",
 		["Improved Whirlwind"] =				"Verbesserter Wirbelwind",
 		["Unending Fury"] =						"Unendlicher Furor",
-		["Improved Mortal Strike"] =			"Verbesserter tödlicher Stoß",
+		["Improved Mortal Strike"] =			"Verbesserter t\195\182dlicher Sto\195\159",
 	
 		-- Buffs
-		["Slam!"] =								"Zerschmettern!",
+		["Slam!"] =					       		"Zerschmettern!",
 	
 		-- Abilities
 		["Slam"] =								"Zerschmettern",
 		["Heroic Throw"] =						"Heldenhafter Wurf",
-		["Devastate"] =							"Verwüsten",
-		["Mortal Strike"] =						"Tödlicher Stoß",
+		["Devastate"] =							"Verw\195\188sten",
+		["Mortal Strike"] =						"T\195\182dlicher Sto\195\159",
 		["Victory Rush"] =						"Siegesrausch",
 		["Bloodthirst"] =						"Blutdurst",
 		["Whirlwind"] =							"Wirbelwind"
