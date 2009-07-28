@@ -18,12 +18,15 @@ function FuryMonitor.Abilities(character)
 						+ character:GetAttackPower() * character:GetMainHandNormalizedSpeed() / 14
 						+ character:GetDamageBuff();
 
-					local oh_damage = character:GetOffHandWeaponDamage()
-						+ character:GetAttackPower() * character:GetOffHandNormalizedSpeed() / 14
-						+ character:GetDamageBuff();
-					oh_damage = oh_damage
-						* 0.5
-						* (1 + 0.05 * character:GetTalent("Dual Wield Specialization"):GetRank());
+					local oh_damage = character:GetOffHandWeaponDamage();
+					if oh_damage > 0 then
+						oh_damage = oh_damage
+							+ character:GetAttackPower() * character:GetOffHandNormalizedSpeed() / 14
+							+ character:GetDamageBuff();
+						oh_damage = oh_damage
+							* 0.5
+							* (1 + 0.05 * character:GetTalent("Dual Wield Specialization"):GetRank());
+					end	
 
 					local damage = (mh_damage + oh_damage)
 						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
@@ -47,7 +50,6 @@ function FuryMonitor.Abilities(character)
 					
 					damage = damage
 						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
-						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
 						;
 	
 					return math.floor(damage);

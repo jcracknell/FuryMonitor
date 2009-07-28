@@ -19,8 +19,8 @@ function FuryMonitor.AbilityFrame:new(ability, useId, time, parentFrame, rageSta
 		table.remove(FuryMonitor.AbilityFrame.Inactive, #FuryMonitor.AbilityFrame.Inactive);
 	else
 		-- We've run out of frames, so create a new one
+		local rageIndicatorFrame = CreateFrame("Frame", nil, UIParent);
 		local iconFrame = CreateFrame("Frame", nil, UIParent);
-		local rageIndicatorFrame = CreateFrame("Frame", nil, iconFrame);
 		local text = iconFrame:CreateFontString(nil);
 
 		local members = {

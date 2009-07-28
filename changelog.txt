@@ -1,16 +1,4 @@
-0.3.0 - 2009-02-07
-Fixed a bug where FuryMonitor would spew errors if there were no abilities available (ie. new Warrior character)
-FuryMonitor now only loads if the player's character is a Warrior.
-Added talent support such that ability damage reflects player talents (Unending Fury, Improved Whirlwind, Two-Handed Weapon Specialization, Dual Wield Specialization)
-Re-implemented damage calculation for most abilities, I believe they are correct now.
-Added Bloodsurge (instant Slam) to the rotation
-Changed Bloodthirst to reflect changes in 3.0.3 (increased damage)
-Added GetMainHandNormalizedSpeed() and GetOffHandNormalizedSpeed() methods to character abstraction (to support Mortal Strike, Devastate, etc)
-Added support for overriding the behavior of Ability:IsAvailable() on a per-instance basis. This lets you control an ability's "availability" based on character buffs, etc (i.e. Bloodsurge).
-Changing stances now correctly updates the rotation/ability damage immediately
-Fixed a bug in Ability:GetCooldownDuration() that caused all abilities to take on the cooldown of any ability with a cooldown under the GCD (due to haste)
-Removed rage dump frame entirely (heroic strike), as it was mostly useless and didn't work well anyways.
-Converted most internal events to use the Observer pattern, removed all use of string keys for events
-Fixed a bug that would cause errors when aquiring new abilities via talent changes
-FuryMonitor now respects the immense power of Alt-Z and UI scale (all frames given a parent)
-FuryMonitor is now liscenced under the WTFPL. If you are not familiar with the terms and restrictions imposed by the WTFPL, you can review them in the provided wtfpl.txt
+0.3.1 - 2009-02-20
+Fixed Whirlwind damage calculation so that attack power for the offhand weapon is no longer included when using a single weapon
+Fixed stacking of rage indicators, previously they were under the ability frames, making them hard to see.
+Bloodthirst no longer incorrectly applies Two-Handed Weapon Specialization to its damage

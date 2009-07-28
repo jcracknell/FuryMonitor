@@ -89,18 +89,27 @@ function FuryMonitor.Character:GetMainHandNormalizedSpeed()
 end
 
 function FuryMonitor.Character:GetOffHandDamage()
-	local mh_low, mh_hi, oh_low, oh_hi, buff, debuff, pct
-		= UnitDamage("player");
-
-	if not oh_low then
+	-- Check that there is actually a weapon equipped in the off hand
+	local weaponLink = GetInventoryItemLink("PLAYER", 17);
+	if not weaponLink then
 		return 0;
 	end	
+	
+	local _, _, oh_low, oh_hi, buff, debuff, pct
+		= UnitDamage("player");
+
 	return ((oh_low + oh_hi) / 2 + buff + debuff) / pct;
 end
 
 function FuryMonitor.Character:GetOffHandWeaponDamage()
 	-- Returns the average damage range of the weapon equipped in the off hand
-	return self:GetOffHandDamage()
+
+	local oh_damage = self:GetOffHandDamage();
+	if oh_damage == 0 then
+		return 0;
+	end	
+
+	return oh_damage
 		/ (1 + 0.02 * self:GetTalent("Two-Handed Weapon Specialization"):GetRank())
 		/ (1 + 0.05 * self:GetTalent("Dual Wield Specialization"):GetRank())
 		/ 0.5

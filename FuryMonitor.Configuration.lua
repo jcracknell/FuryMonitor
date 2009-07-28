@@ -7,7 +7,7 @@ http://sam.zoy.org/wtpl/COPYING for more details.
 ]]--
 
 FuryMonitor.Configuration = {
-	Version = 				000300,
+	Version = 				000301,
 	AbilityFrame = {
 		Width = 			30,
 		Height =			30,
