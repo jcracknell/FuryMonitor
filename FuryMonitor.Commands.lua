@@ -1,3 +1,11 @@
+--[[
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What The Fuck You Want
+To Public Liscence, Version 2, as published by Sam Hocevar. See
+http://sam.zoy.org/wtpl/COPYING for more details.
+]]--
+
 FuryMonitor.Commands = {};
 
 -----------------------------------------
@@ -104,7 +112,7 @@ function FuryMonitor.Commands.debug_ability_show()
 	end
 end
 
-function FuryMonitor.Commands.debug_show_rotationitem_active()
+function FuryMonitor.Commands.debug_rotationitem_active()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("FuryMonitor.RotationItem.Active:");
 	for k, v in pairs(FuryMonitor.RotationItem.Active) do
@@ -115,7 +123,7 @@ function FuryMonitor.Commands.debug_show_rotationitem_active()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_rotationitem_inactive()
+function FuryMonitor.Commands.debug_rotationitem_inactive()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("");
 	fm:PrintMessage("FuryMonitor.RotationItem.Inactive:");
@@ -127,7 +135,7 @@ function FuryMonitor.Commands.debug_show_rotationitem_inactive()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_rotation()
+function FuryMonitor.Commands.debug_rotation()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("");
 	fm:PrintMessage("Currently proposed rotation:");
@@ -144,7 +152,7 @@ function FuryMonitor.Commands.debug_show_rotation()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_abilityframe_active()
+function FuryMonitor.Commands.debug_abilityframe_active()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("");
 	fm:PrintMessage("FuryMonitor.AbilityFrame.Active");
@@ -157,7 +165,7 @@ function FuryMonitor.Commands.debug_show_abilityframe_active()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_abilityframe_inactive()
+function FuryMonitor.Commands.debug_abilityframe_inactive()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("");
 	fm:PrintMessage("FuryMonitor.AbilityFrame.Inactive");
@@ -167,14 +175,25 @@ function FuryMonitor.Commands.debug_show_abilityframe_inactive()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_character_hit()
+function FuryMonitor.Commands.debug_character_hit()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("");
 	fm:PrintMessage(fm:GetCharacter():GetHitChance());
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_character_weapondamage()
+function FuryMonitor.Commands.debug_character_normalizedweaponspeed()
+	local fm = FuryMonitor.Main:GetInstance();
+	local character = fm:GetCharacter();
+	fm:PrintMessage("");
+	fm:PrintMessage(
+		"MH: " .. character:GetMainHandNormalizedSpeed() .. " " ..
+		"OH: " .. character:GetOffHandNormalizedSpeed()
+	);
+	return true;
+end
+
+function FuryMonitor.Commands.debug_character_weapondamage()
 	local fm = FuryMonitor.Main:GetInstance();
 	local character = fm:GetCharacter();
 	fm:PrintMessage("");
@@ -185,7 +204,7 @@ function FuryMonitor.Commands.debug_show_character_weapondamage()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_character_weaponspeed()
+function FuryMonitor.Commands.debug_character_weaponspeed()
 	local fm = FuryMonitor.Main:GetInstance();
 	local character = fm:GetCharacter();
 	fm:PrintMessage("");
@@ -196,7 +215,18 @@ function FuryMonitor.Commands.debug_show_character_weaponspeed()
 	return true;
 end
 
-function FuryMonitor.Commands.debug_show_permutationcache()
+function FuryMonitor.Commands.debug_character_talents()
+	local fm = FuryMonitor.Main:GetInstance();
+	local character = fm:GetCharacter();
+
+	fm:PrintMessage("Currently loaded talents:");
+	for name, talent in pairs(character._talents) do
+		fm:PrintMessage(name .. " (Rank " .. talent:GetRank() .. ")");
+	end
+	return true;
+end
+
+function FuryMonitor.Commands.debug_permutationcache()
 	local fm = FuryMonitor.Main:GetInstance();
 	fm:PrintMessage("");
 	fm:PrintMessage("Permutation cache:");
@@ -496,35 +526,41 @@ FuryMonitor.Commands.SlashCommandStructure = {
 		},
 		abilityframe = { _d = "Functions to show information regarding the pool of AbilityFrames.",
 			active = { _d = "Show the current pool of active AbilityFrames.",
-				_f = FuryMonitor.Commands.debug_show_abilityframe_active
+				_f = FuryMonitor.Commands.debug_abilityframe_active
 			},
 			inactive = { _d = "Show the current pool of inactive AbilityFrames.",
-				_f = FuryMonitor.Commands.debug_show_abilityframe_inactive
+				_f = FuryMonitor.Commands.debug_abilityframe_inactive
 			}	
 		},
 		character = { _d = "Character abstraction debugging functions.",
 			hit = { _d = "Show character hit chance.",
-				_f = FuryMonitor.Commands.debug_show_character_hit
+				_f = FuryMonitor.Commands.debug_character_hit
 			},
+			normalizedweaponspeed = { _d = "Show normalized weapon speeds.",
+				_f = FuryMonitor.Commands.debug_character_normalizedweaponspeed
+			},	
+			talents = { _d = "Show character talents",
+				_f = FuryMonitor.Commands.debug_character_talents
+			},	
 			weapondamage = { _d = "Show weapon damage.",
-				_f = FuryMonitor.Commands.debug_show_character_weapondamage
+				_f = FuryMonitor.Commands.debug_character_weapondamage
 			},
 			weaponspeed = { _d = "Show weapon speeds.",
-				_f = FuryMonitor.Commands.debug_show_character_weaponspeed
+				_f = FuryMonitor.Commands.debug_character_weaponspeed
 			}
 		},
 		permutationcache = { _d = "Show the cached permutations table.",
-			_f = FuryMonitor.Commands.debug_show_permutationcache
+			_f = FuryMonitor.Commands.debug_permutationcache
 		},
 		rotation = { _d = "Show the current proposed rotation.",
-			_f = FuryMonitor.Commands.debug_show_rotation
+			_f = FuryMonitor.Commands.debug_rotation
 		},
 		rotationitem = { _d = "Functions to show information regarding the pool of RotationItems.",
 			active = { _d = "Show the current pool of active RotationItems.",
-				_f = FuryMonitor.Commands.debug_show_rotationitem_active
+				_f = FuryMonitor.Commands.debug_rotationitem_active
 			},
 			inactive = { _d = "Show the current pool of inactive RotationItems.",
-				_f = FuryMonitor.Commands.debug_show_rotationitem_inactive
+				_f = FuryMonitor.Commands.debug_rotationitem_inactive
 			}
 		},
 		subscriptions = { _d = "Show information about subscriptions.",

@@ -1,3 +1,11 @@
+--[[
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What The Fuck You Want
+To Public Liscence, Version 2, as published by Sam Hocevar. See
+http://sam.zoy.org/wtpl/COPYING for more details.
+]]--
+
 FuryMonitor.AbilityFrame = {};
 FuryMonitor.AbilityFrame.__index = FuryMonitor.AbilityFrame;
 FuryMonitor.AbilityFrame.Active = {};
@@ -11,7 +19,7 @@ function FuryMonitor.AbilityFrame:new(ability, useId, time, parentFrame, rageSta
 		table.remove(FuryMonitor.AbilityFrame.Inactive, #FuryMonitor.AbilityFrame.Inactive);
 	else
 		-- We've run out of frames, so create a new one
-		local iconFrame = CreateFrame("Frame");
+		local iconFrame = CreateFrame("Frame", nil, UIParent);
 		local rageIndicatorFrame = CreateFrame("Frame", nil, iconFrame);
 		local text = iconFrame:CreateFontString(nil);
 

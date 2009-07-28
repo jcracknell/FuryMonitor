@@ -1,3 +1,11 @@
+--[[
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What The Fuck You Want
+To Public Liscence, Version 2, as published by Sam Hocevar. See
+http://sam.zoy.org/wtpl/COPYING for more details.
+]]--
+
 FuryMonitor.Character = {};
 FuryMonitor.Character.__index = FuryMonitor.Character;
 FuryMonitor.Character.PrecisionSpellIds = { [0.01] = 29590, [0.02] = 29591, [0.03] = 29592 };
@@ -35,6 +43,11 @@ function FuryMonitor.Character:GetGlobalCooldown()
 	return 1.5;
 end
 
+function FuryMonitor.Character:GetDamageMultiplier()
+	local _, _, _, _, _, _, pct;
+	return pct;
+end
+
 function FuryMonitor.Character:GetDamageBuff()
 	local _, _, _, _, buff, debuff, _ = UnitDamage("player");
 	return buff + debuff;
@@ -48,15 +61,11 @@ function FuryMonitor.Character:GetMainHandDamage()
 end
 
 function FuryMonitor.Character:GetMainHandWeaponDamage()
-	local damage = self:GetMainHandDamage()
-		- (self:GetAttackPower() * self:GetMainHandWeaponSpeed() / 14);
-	self._mainHandWeaponDamage = math.min(
-		self._mainHandWeaponDamage,
-		self:GetMainHandDamage()
-			- (self:GetAttackPower()
-			* self:GetMainHandWeaponSpeed() / 14)
-	);
-	return self._mainHandWeaponDamage;
+	-- Returns the unmodified average damage of the weapon equipped in the main hand
+	return self:GetMainHandDamage()
+		/ (1 + 0.02 * self:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+		- self:GetAttackPower() * self:GetMainHandWeaponSpeed() / 14
+		;
 end
 
 function FuryMonitor.Character:GetMainHandNormalizedSpeed()
@@ -86,21 +95,16 @@ function FuryMonitor.Character:GetOffHandDamage()
 	if not oh_low then
 		return 0;
 	end	
-	return ((oh_low + oh_hi) / 2 + buff + debuff) / pct;	
+	return ((oh_low + oh_hi) / 2 + buff + debuff) / pct;
 end
 
 function FuryMonitor.Character:GetOffHandWeaponDamage()
-	if self:GetOffHandDamage() == 0 then
-		return 0;
-	end
-	self._offHandWeaponDamage = math.min(
-		self._offHandWeaponDamage,
-		self:GetOffHandDamage()
-		- (self:GetAttackPower()
-			* self:GetOffHandWeaponSpeed() / 14
-			* 0.625)
-	);
-	return self._offHandWeaponDamage;
+	-- Returns the average damage range of the weapon equipped in the off hand
+	return self:GetOffHandDamage()
+		/ (1 + 0.02 * self:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+		/ (1 + 0.05 * self:GetTalent("Dual Wield Specialization"):GetRank())
+		/ 0.5
+		- self:GetAttackPower() * self:GetOffHandWeaponSpeed() / 14;
 end
 
 function FuryMonitor.Character:GetOffHandNormalizedSpeed()

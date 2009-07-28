@@ -1,3 +1,11 @@
+--[[
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What The Fuck You Want
+To Public Liscence, Version 2, as published by Sam Hocevar. See
+http://sam.zoy.org/wtpl/COPYING for more details.
+]]--
+
 FuryMonitor.PowerBar = { _instance = nil }
 FuryMonitor.PowerBar.__index = FuryMonitor.PowerBar;
 
@@ -36,7 +44,7 @@ end
 		self:SetBackgroundFrame(CreateFrame("Frame", nil, self:GetParentFrame()));
 		
 		-- Create status frame
-		self:SetStatusFrame(CreateFrame("FRAME"));--, nil, self:GetBackgroundFrame()));
+		self:SetStatusFrame(CreateFrame("FRAME", nil, self:GetParentFrame()));--, nil, self:GetBackgroundFrame()));
 
 		-- Create status text
 		self._text = self:GetStatusFrame():CreateFontString(nil);

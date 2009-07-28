@@ -1,3 +1,11 @@
+--[[
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What The Fuck You Want
+To Public Liscence, Version 2, as published by Sam Hocevar. See
+http://sam.zoy.org/wtpl/COPYING for more details.
+]]--
+
 function FuryMonitor.Abilities(character)
 	return {	
 
@@ -6,18 +14,23 @@ function FuryMonitor.Abilities(character)
 			character = character,
 			damageFunction = function(character)
 
-					local damage = character:GetMainHandWeaponDamage()
-						+ character:GetOffHandWeaponDamage()
+					local mh_damage = character:GetMainHandWeaponDamage()
 						+ character:GetAttackPower() * character:GetMainHandNormalizedSpeed() / 14
+						+ character:GetDamageBuff();
+
+					local oh_damage = character:GetOffHandWeaponDamage()
 						+ character:GetAttackPower() * character:GetOffHandNormalizedSpeed() / 14
-							* (0.5 + 0.5 * 0.05 * character:GetTalent("Dual Wield Specialization"):GetRank())
-						;
-	
-					damage = damage
-						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
+						+ character:GetDamageBuff();
+					oh_damage = oh_damage
+						* 0.5
+						* (1 + 0.05 * character:GetTalent("Dual Wield Specialization"):GetRank());
+
+					local damage = (mh_damage + oh_damage)
+						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
 						* (1 + 0.1 * character:GetTalent("Improved Whirlwind"):GetRank())
+						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
 						;
-	
+
 					return math.floor(damage);
 				end,
 			fake = false,
@@ -33,7 +46,9 @@ function FuryMonitor.Abilities(character)
 						;
 					
 					damage = damage
-						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank());
+						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
+						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+						;
 	
 					return math.floor(damage);
 				end,
@@ -53,10 +68,10 @@ function FuryMonitor.Abilities(character)
 			cooldown = 1.5,
 			character = character,
 			damageFunction = function(character)
-					return math.floor(
-						character:GetAttackPower() * 0.45
-						+ character:GetDamageBuff()
-					);	
+					local damage = character:GetAttackPower() * 0.45
+						+ character:GetDamageBuff();
+
+					return math.floor(damage);	
 				end,
 			fake = false,
 			reactive = true, reactiveUses = 1, reactionDuration = 20
@@ -66,10 +81,18 @@ function FuryMonitor.Abilities(character)
 			cooldown = 6,
 			character = character,
 			damageFunction = function(character)
-					return math.floor(
-						character:GetMainHandWeaponDamage()
+					local damage = character:GetMainHandWeaponDamage()
 						+ character:GetAttackPower() * character:GetMainHandNormalizedSpeed() / 14
-					);
+						+ 380
+						+ character:GetDamageBuff()
+						;
+					
+					damage = damage
+						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+						* (1 + 0.03 * character:GetTalent("Improved Mortal Strike"):GetRank())
+						;
+
+					return math.floor(damage);
 				end,
 			fake = false
 		}),
@@ -78,12 +101,18 @@ function FuryMonitor.Abilities(character)
 			cooldown = 1.5,
 			character = character,
 			damageFunction = function(character)
-					return math.floor(
-						0.5 *
-						(character:GetMainHandWeaponDamage()
-						+ character():GetAttackPower() * character:GetMainHandNormalizedSpeed() / 14
-						+ character():GetDamageBuff())
-					);
+					local damage = (
+						character:GetMainHandWeaponDamage()
+						+ character:GetAttackPower() + character:GetMainHandNormalizedSpeed() / 14
+						+ character:GetDamageBuff()
+						+ 24 * 5
+					) * 0.5;
+
+					damage = damage
+						* (1 + 0.02 * character:GetTalent("One-Handed Weapon Specialization"):GetRank())
+						;
+					
+					return math.floor(damage);
 				end,
 			fake = false
 		}),
@@ -92,10 +121,14 @@ function FuryMonitor.Abilities(character)
 			cooldown = 60,
 			character = character,
 			damageFunction = function(character)
-					return math.floor(
-						character:GetAttackPower() * 0.5
-						+ character:GetDamageBuff()
-					);	
+					local damage = character:GetAttackPower() * 0.5
+						+ character:GetDamageBuff();
+
+					damage = damage
+						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+						;
+
+					return math.floor(damage);	
 				end,
 			fake = false
 		}),
@@ -104,9 +137,13 @@ function FuryMonitor.Abilities(character)
 			cooldown = 1.5,
 			character = character,
 			damageFunction = function(character)
-					local damage = character:GetMainHandDamage() + 140;
+					local damage = character:GetMainHandWeaponDamage()
+						+ character:GetAttackPower() * character:GetMainHandWeaponSpeed() / 14
+						+ 250
+						+ character:GetDamageBuff();
 	
 					damage = damage
+						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
 						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
 						;
 	
