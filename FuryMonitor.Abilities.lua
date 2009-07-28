@@ -3,7 +3,7 @@ This program is free software. It comes without any warranty, to
 the extent permitted by applicable law. You can redistribute it
 and/or modify it under the terms of the Do What The Fuck You Want
 To Public Liscence, Version 2, as published by Sam Hocevar. See
-http://sam.zoy.org/wtpl/COPYING for more details.
+http://sam.zoy.org/wtfpl/COPYING for more details.
 ]]--
 
 function FuryMonitor.Abilities(character)
@@ -119,6 +119,7 @@ function FuryMonitor.Abilities(character)
 			fake = false
 		}),
 
+		--[[
 		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Heroic Throw"),
 			cooldown = 60,
 			character = character,
@@ -134,6 +135,7 @@ function FuryMonitor.Abilities(character)
 				end,
 			fake = false
 		}),
+		]]--
 
 		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Slam"),
 			cooldown = 1.5,
