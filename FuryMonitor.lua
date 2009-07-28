@@ -77,6 +77,10 @@ function FuryMonitor.Util.permute_table(tbl)
 	return permutations;
 end
 
+
+-- These two functions are used to temporarily fix the time to a specific value
+-- while performing computations. Otherwise the time changes constantly (duh)
+-- and you get really wierd results when trying to build a rotation.
 function FuryMonitor.Util.UpdateTime()
 	FuryMonitor.Util._time = GetTime();
 end

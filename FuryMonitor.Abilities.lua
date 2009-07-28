@@ -9,10 +9,10 @@ http://sam.zoy.org/wtpl/COPYING for more details.
 function FuryMonitor.Abilities(character)
 	return {	
 
-		FuryMonitor.Ability:new({ name = "Whirlwind",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Whirlwind"),
 			cooldown = 10,
 			character = character,
-			damageFunction = function(character)
+			damageFunction = function(character) local L = FuryMonitor.Localization.Localize;
 
 					local mh_damage = character:GetMainHandWeaponDamage()
 						+ character:GetAttackPower() * character:GetMainHandNormalizedSpeed() / 14
@@ -25,13 +25,13 @@ function FuryMonitor.Abilities(character)
 							+ character:GetDamageBuff();
 						oh_damage = oh_damage
 							* 0.5
-							* (1 + 0.05 * character:GetTalent("Dual Wield Specialization"):GetRank());
+							* (1 + 0.05 * character:GetTalent(L("Dual Wield Specialization")):GetRank());
 					end	
 
 					local damage = (mh_damage + oh_damage)
-						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
-						* (1 + 0.1 * character:GetTalent("Improved Whirlwind"):GetRank())
-						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Two-Handed Weapon Specialization")):GetRank())
+						* (1 + 0.1 * character:GetTalent(L("Improved Whirlwind")):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Unending Fury")):GetRank())
 						;
 
 					return math.floor(damage);
@@ -40,16 +40,16 @@ function FuryMonitor.Abilities(character)
 			reactive = false
 		}),
 
-		FuryMonitor.Ability:new({ name = "Bloodthirst",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Bloodthirst"),
 			cooldown = 5,
 			character = character,
-			damageFunction = function(character)
+			damageFunction = function(character) local L = FuryMonitor.Localization.Localize;
 					local damage = character:GetAttackPower() * 0.5
 						+ character:GetDamageBuff()
 						;
 					
 					damage = damage
-						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Unending Fury")):GetRank())
 						;
 	
 					return math.floor(damage);
@@ -66,7 +66,7 @@ function FuryMonitor.Abilities(character)
 			reactive = false
 		}),
 
-		FuryMonitor.Ability:new({ name = "Victory Rush",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Victory Rush"),
 			cooldown = 1.5,
 			character = character,
 			damageFunction = function(character)
@@ -79,10 +79,10 @@ function FuryMonitor.Abilities(character)
 			reactive = true, reactiveUses = 1, reactionDuration = 20
 		}),
 
-		FuryMonitor.Ability:new({ name = "Mortal Strike",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Mortal Strike"),
 			cooldown = 6,
 			character = character,
-			damageFunction = function(character)
+			damageFunction = function(character) local L = FuryMonitor.Localization.Localize;
 					local damage = character:GetMainHandWeaponDamage()
 						+ character:GetAttackPower() * character:GetMainHandNormalizedSpeed() / 14
 						+ 380
@@ -90,8 +90,8 @@ function FuryMonitor.Abilities(character)
 						;
 					
 					damage = damage
-						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
-						* (1 + 0.03 * character:GetTalent("Improved Mortal Strike"):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Two-Handed Weapon Specialization")):GetRank())
+						* (1 + 0.03 * character:GetTalent(L("Improved Mortal Strike")):GetRank())
 						;
 
 					return math.floor(damage);
@@ -99,10 +99,10 @@ function FuryMonitor.Abilities(character)
 			fake = false
 		}),
 
-		FuryMonitor.Ability:new({ name = "Devastate",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Devastate"),
 			cooldown = 1.5,
 			character = character,
-			damageFunction = function(character)
+			damageFunction = function(character) local L = FuryMonitor.Localization.Localize;
 					local damage = (
 						character:GetMainHandWeaponDamage()
 						+ character:GetAttackPower() + character:GetMainHandNormalizedSpeed() / 14
@@ -111,7 +111,7 @@ function FuryMonitor.Abilities(character)
 					) * 0.5;
 
 					damage = damage
-						* (1 + 0.02 * character:GetTalent("One-Handed Weapon Specialization"):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("One-Handed Weapon Specialization")):GetRank())
 						;
 					
 					return math.floor(damage);
@@ -119,15 +119,15 @@ function FuryMonitor.Abilities(character)
 			fake = false
 		}),
 
-		FuryMonitor.Ability:new({ name = "Heroic Throw",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Heroic Throw"),
 			cooldown = 60,
 			character = character,
-			damageFunction = function(character)
+			damageFunction = function(character) local L = FuryMonitor.Localization.Localize;
 					local damage = character:GetAttackPower() * 0.5
 						+ character:GetDamageBuff();
 
 					damage = damage
-						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Two-Handed Weapon Specialization")):GetRank())
 						;
 
 					return math.floor(damage);	
@@ -135,18 +135,18 @@ function FuryMonitor.Abilities(character)
 			fake = false
 		}),
 
-		FuryMonitor.Ability:new({ name = "Slam",
+		FuryMonitor.Ability:new({ name = FuryMonitor.Localization.Localize("Slam"),
 			cooldown = 1.5,
 			character = character,
-			damageFunction = function(character)
+			damageFunction = function(character) local L = FuryMonitor.Localization.Localize;
 					local damage = character:GetMainHandWeaponDamage()
 						+ character:GetAttackPower() * character:GetMainHandWeaponSpeed() / 14
 						+ 250
 						+ character:GetDamageBuff();
 	
 					damage = damage
-						* (1 + 0.02 * character:GetTalent("Two-Handed Weapon Specialization"):GetRank())
-						* (1 + 0.02 * character:GetTalent("Unending Fury"):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Two-Handed Weapon Specialization")):GetRank())
+						* (1 + 0.02 * character:GetTalent(L("Unending Fury")):GetRank())
 						;
 	
 					return math.floor(damage);
@@ -159,7 +159,7 @@ function FuryMonitor.Abilities(character)
 						local buffName;
 						for buffSlot = 1, 16 do
 							buffName = UnitBuff("PLAYER", buffSlot);
-							if buffName == "Slam!" then
+							if buffName == FuryMonitor.Localization.Localize("Slam!") then
 								return true;
 							end
 						end

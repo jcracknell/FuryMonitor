@@ -32,7 +32,10 @@ function FuryMonitor.Main:GetInstance()
 			_powerBar = nil,
 			_rotation = nil,
 			_rotationStabilized = false,
+			_combatState = false,
+			_combatTransitionTime = 0,
 			_subscribers = {
+				OnAlphaChanged = {},
 				OnConfigurationChanged = {},
 				OnTalentsChanged = {},
 				OnEquipmentChanged = {},
@@ -48,11 +51,20 @@ function FuryMonitor.Main:GetInstance()
 				PLAYER_LEVEL_UP = function(fm) fm:OnStatsChanged() end,
 				UNIT_SPELLCAST_SUCCEEDED = function(fm) fm:OnSpellCast() end,
 				CHARACTER_POINTS_CHANGED = function(fm) fm:OnTalentsChanged() end,
-				UPDATE_SHAPESHIFT_FORM = function(fm) fm:OnStatsChanged() end
+				UPDATE_SHAPESHIFT_FORM = function(fm) fm:OnStatsChanged() end,
+				PLAYER_ENTER_COMBAT = function(fm) fm:OnEnterCombat() end,
+				PLAYER_LEAVE_COMBAT = function(fm) fm:OnLeaveCombat() end
 			}
 		};
 		self._instance = setmetatable(members, FuryMonitor.Main);
 
+		-- Subscribe all of the abilities to talent change notifications
+		for _, ability in pairs(self._instance._abilities) do
+			self._instance:SubscribeToTalentChanges(ability);
+		end
+
+		FuryMonitor.Configuration.Display.Alpha
+			= FuryMonitor.Configuration.Display.IdleAlpha;
 	end
 	return self._instance;
 end
@@ -163,6 +175,22 @@ function FuryMonitor.Main:GetRotationWidth()
 	return self._rotationWidth;
 end
 
+function FuryMonitor.Main:GetCombatState()
+	return self._combatState;
+end
+
+function FuryMonitor.Main:SetCombatState(value)
+	self._combatState = value;
+end
+
+function FuryMonitor.Main:GetCombatTransitionTime()
+	return self._combatTransitionTime;
+end
+
+function FuryMonitor.Main:SetCombatTransitionTime(value)
+	self._combatTransitionTime = value;
+end
+
 -------------------------------------------------
 -- END GETTERS/SETTERS
 -------------------------------------------------
@@ -170,6 +198,14 @@ end
 -------------------------------------------------
 -- BEGIN FUNCTIONS
 -------------------------------------------------
+
+function FuryMonitor.Main:SubscribeToAlphaChanges(subscriber)
+	self._subscribers.OnAlphaChanged[subscriber] = true;
+end
+
+function FuryMonitor.Main:UnSubscribeToAlphaChanges(subscriber)
+	self._subscribers.OnAlphaChanged[subscriber] = nil;
+end
 
 function FuryMonitor.Main:SubscribeToConfigurationChanges(subscriber)
 	self._subscribers.OnConfigurationChanged[subscriber] = true;
@@ -523,7 +559,53 @@ function FuryMonitor.Main:PrintMessage(message)
 	DEFAULT_CHAT_FRAME:AddMessage(message);
 end
 
+function FuryMonitor.Main:CombatFade()
+	local idleAlpha = FuryMonitor.Configuration.Display.IdleAlpha;
+	local combatAlpha = FuryMonitor.Configuration.Display.CombatAlpha;
+
+	if FuryMonitor.Util.GetTime() - self:GetCombatTransitionTime()
+		< FuryMonitor.Configuration.Display.AlphaFadeDuration
+	-- Do one last update if the transition is over to make sure the transition
+	-- fully completed (Alpha = Idle/CombatAlpha)
+	or (FuryMonitor.Configuration.Display.Alpha 
+		~= ((self:GetCombatState() and combatAlpha) or idleAlpha))
+	then
+		local transitionProgress = math.min(1,
+			(FuryMonitor.Util.GetTime() - self:GetCombatTransitionTime())
+			/ FuryMonitor.Configuration.Display.AlphaFadeDuration
+		);
+		
+		local distance = combatAlpha - idleAlpha;
+		
+		FuryMonitor.Configuration.Display.Alpha
+			= (self:GetCombatState()
+				and (idleAlpha + transitionProgress * distance))
+				or (combatAlpha - transitionProgress * distance)
+			;	
+		
+		-- Fix any rounding errors that may occur
+		if math.abs(((self:GetCombatState() and combatAlpha) or idleAlpha)
+			- FuryMonitor.Configuration.Display.Alpha)
+			< 0.01
+		then
+			FuryMonitor.Configuration.Display.Alpha
+				= (self:GetCombatState() and combatAlpha) or idleAlpha;
+		end
+
+		self:GetRotationTrayFrame():SetAlpha(
+			FuryMonitor.Configuration.Tray.Alpha
+			* FuryMonitor.Configuration.Display.Alpha
+		);	
+		-- Notify subscribers that the alpha value has changed
+		for subscriber, _ in pairs(self._subscribers.OnAlphaChanged) do
+			subscriber:OnAlphaChanged();
+		end
+	end
+end
+
 function FuryMonitor.Main:Redraw()
+	self:CombatFade();
+
 	if self:GetRotationStabilized() then
 		return;
 	end
@@ -546,9 +628,7 @@ function FuryMonitor.Main:Redraw()
 		-- Check if there is already an AbilityFrame for the current
 		-- RotationItem
 		local af = FuryMonitor.AbilityFrame:GetAbilityFrame(
-			rotation:GetAbility():GetSpellNumber(),
-			rotation:GetUseId()
-		);	
+			rotation:GetAbility(), rotation:GetUseId());	
 		if not af then
 			af = FuryMonitor.AbilityFrame:new(
 				rotation:GetAbility(),
@@ -728,32 +808,79 @@ function FuryMonitor.Main:OnTalentsChanged()
 	self:OnStatsChanged();
 end
 
+function FuryMonitor.Main:OnEnterCombat()
+	if not self:GetCombatState() then
+		FuryMonitor.Util.UpdateTime();
+
+		self:SetCombatState(true);
+		self:SetCombatTransitionTime(FuryMonitor.Util.GetTime());
+	end
+end
+
+function FuryMonitor.Main:OnLeaveCombat()
+	if self:GetCombatState() then
+		FuryMonitor.Util.UpdateTime();
+
+		self:SetCombatState(false);
+		self:SetCombatTransitionTime(FuryMonitor.Util.GetTime());
+	end
+end
+
 -------------------------------------------------
 -- END EVENT HANDLERS
 -------------------------------------------------
 
+function FuryMonitor.Main.MigrateConfiguration(currentConfig, savedConfig)
+	for key, value in pairs(savedConfig) do
+		if currentConfig[key] then
+			-- Do not migrate the key if it does not exist in the new configuration
+			if type(value) == "table" then
+				-- If the current value is a table, then copy values individually so
+				-- we retain any new values in the current configuration file
+				FuryMonitor.Main.MigrateConfiguration(currentConfig[key], value);
+			else
+				-- Otherwise just copy the value
+				currentConfig[key] = value;
+			end
+		end
+	end
+end
+
 -- Set up a useless frame to handle startup
 FuryMonitor.Main._loadFrame = CreateFrame("Frame");
 FuryMonitor.Main._loadFrame:Hide();
-FuryMonitor.Main._loadFrame:SetScript(
-	"OnEvent",
-	function(frame, event)
-		frame:UnregisterEvent(event);
-		if event ~= "VARIABLES_LOADED" then
-			return;
-		end
-		if FuryMonitor_SavedConfiguration
-		and FuryMonitor_SavedConfiguration.Version == FuryMonitor.Configuration.Version then
-			FuryMonitor.Configuration = FuryMonitor_SavedConfiguration;
-		else
-			FuryMonitor.Main:GetInstance():PrintMessage(
-				"FuryMonitor: Old configuration overwritten with new defaults.");
-			FuryMonitor.Main:GetInstance():PrintMessage(
-				"To change configuration options, type /fm.");	
-		end
-		if UnitClass("PLAYER") == "Warrior" then
-			FuryMonitor.Main:GetInstance():OnLoad();
-		end
+FuryMonitor.Main._loadFrame:SetScript("OnEvent", function(frame, event)
+	frame:UnregisterEvent(event);
+	if event ~= "VARIABLES_LOADED" then
+		return;
 	end
-);	
+	if FuryMonitor_SavedConfiguration
+	and (FuryMonitor_SavedConfiguration.Version >= FuryMonitor.Configuration.Version)
+	or (FuryMonitor_SavedConfiguration and FuryMonitor_SavedConfiguration.Version >= FuryMonitor.Configuration.OldestCompatible)
+	then
+		-- If there is an existing configuration and it is compatible with the
+		-- provided default configuration, then copy the applicable values from
+		-- the saved configuration to the one used by FuryMonitor
+		local version = FuryMonitor.Configuration.Version;
+		FuryMonitor.Main.MigrateConfiguration(
+			FuryMonitor.Configuration,
+			FuryMonitor_SavedConfiguration
+		);
+		FuryMonitor.Configuration.Version = version;
+	else
+		-- Otherwise do nothing and use the provided defaults.
+		-- Print a nice message to tell the user what to do.
+		FuryMonitor.Main:GetInstance():PrintMessage(
+			"FuryMonitor: Old configuration overwritten with new defaults.");
+		FuryMonitor.Main:GetInstance():PrintMessage(
+			"To change configuration options, type /fm.");	
+	end
+
+	local L = FuryMonitor.Localization.Localize;
+	if UnitClass("PLAYER") == L("Warrior")
+		-- Feminine noun of warrior used in some locales (german, french, ?)
+		or UnitClass("PLAYER") == L("WarriorF") then
+		FuryMonitor.Main:GetInstance():OnLoad();
+	end
+end);	
 FuryMonitor.Main._loadFrame:RegisterEvent("VARIABLES_LOADED");

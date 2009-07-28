@@ -90,7 +90,9 @@ end
 					t = t .. " " .. k;
 				end
 				if v._a then -- Print args
-					t = t .. "|cB36666FF " .. v._a;
+					-- Highlight type specifications
+					local args = string.gsub(v._a, "(:[^%s]+)", "|cB37799FF%1|cB333FF33");
+					t = t .. "|cB333FF33 " .. args;
 				end
 				if v._d then -- Print description
 					t = t .. "|cB3FFFF66 - " .. v._d;
@@ -257,33 +259,57 @@ function FuryMonitor.Commands.debug_subscriptions()
 end
 
 function FuryMonitor.Commands.set_Display_AbilitySpacing(spacing)
-	if not spacing then
-		return false;
-	end
+	local v = false;
+	v, spacing = FuryMonitor.Validation.ValidateDimension(spacing);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.Display.AbilitySpacing = spacing;
 	return true;
 end
 
-function FuryMonitor.Commands.set_Display_Alpha(alpha)
-	if not alpha then
-		return false;
-	end
-	FuryMonitor.Configuration.Display.Alpha = alpha;
+function FuryMonitor.Commands.set_Display_CombatAlpha(alpha)
+	local v = false;
+	v, alpha = FuryMonitor.Validation.ValidateAlpha(alpha);
+	if not v then return false; end
+
+	FuryMonitor.Configuration.Display.CombatAlpha = alpha;
+	return true;
+end
+
+function FuryMonitor.Commands.set_Display_IdleAlpha(alpha)
+	local v = false;
+	v, alpha = FuryMonitor.Validation.ValidateAlpha(alpha);
+	if not v then return false; end
+
+	FuryMonitor.Configuration.Display.IdleAlpha = alpha;
+	return true;
+end
+
+function FuryMonitor.Commands.set_Display_AlphaFadeDuration(duration)
+	local v = false;
+	v, duration = FuryMonitor.Validation.ValidateDuration(duration);
+	if not v then return false; end
+
+	FuryMonitor.Configuration.Display.AlphaFadeDuration = duration;
 	return true;
 end
 
 function FuryMonitor.Commands.set_Display_Padding(padding)
-	if not padding then
-		return false;
-	end	
+	local v = false;
+	v, padding = FuryMonitor.Validation.ValidateDimension(padding);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.Display.Padding = padding;
 	return true;
 end
 
 function FuryMonitor.Commands.set_Display_Position(x, y)
-	if not x or not y then
-		return false;
-	end	
+	local v = false;
+	v, x = FuryMonitor.Validation.ValidateDimension(x);
+	if not v then return false; end
+	v, y = FuryMonitor.Validation.ValidateDimension(y);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.Display.Position.X = x;
 	FuryMonitor.Configuration.Display.Position.Y = y;
 	return true;
@@ -320,34 +346,38 @@ function FuryMonitor.Commands.set_Display_FrameStrata(strata)
 end	
 
 function FuryMonitor.Commands.set_AbilityFrame_Alpha(alpha)
-	if not alpha then
-		return false;
-	end
+	local v = false;
+	v, alpha = FuryMonitor.Validation.ValidateAlpha(alpha);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.AbilityFrame.Alpha = alpha;
 	return true;
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_Size(size)
-	if not size then
-		return false;
-	end
+	local v = false;
+	v, size = FuryMonitor.Validation.ValidateDimension(size);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.AbilityFrame.Width = size;
 	FuryMonitor.Configuration.AbilityFrame.Height = size;
 	return true;
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_FontSize(fontSize)
-	if not fontSize then
-		return false;
-	end
+	local v = false;
+	v, fontSize = FuryMonitor.Validation.ValidateFontSize(fontSize);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.AbilityFrame.FontSize = fontSize;
 	return true;
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_FontColor(r, g, b, a)
-	if not (r and g and b and a) then
-		return false;
-	end
+	local v = false;
+	v, r, g, b, a = FuryMonitor.Validation.ValidateColor(r, g, b, a);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.AbilityFrame.FontColor.R = r;
 	FuryMonitor.Configuration.AbilityFrame.FontColor.G = g;
 	FuryMonitor.Configuration.AbilityFrame.FontColor.B = b;
@@ -356,9 +386,10 @@ function FuryMonitor.Commands.set_AbilityFrame_FontColor(r, g, b, a)
 end
 
 function FuryMonitor.Commands.set_PowerBar_AnimationTime(time)
-	if not time then
-		return false;
-	end
+	local v = false;
+	v, time = FuryMonitor.Validation.ValidateDuration(time);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.PowerBar.AnimationTime = time;
 	return true;
 end
@@ -372,9 +403,10 @@ function FuryMonitor.Commands.set_PowerBar_BackgroundFile(backgroundFile)
 end
 
 function FuryMonitor.Commands.set_PowerBar_Color(r, g, b, a)
-	if not (r and g and b and a) then
-		return false;
-	end
+	local v = false;
+	v, r, g, b, a = FuryMonitor.Validation.ValidateColor(r, g, b, a);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.PowerBar.Color.R = r;
 	FuryMonitor.Configuration.PowerBar.Color.G = g;
 	FuryMonitor.Configuration.PowerBar.Color.B = b;
@@ -383,9 +415,10 @@ function FuryMonitor.Commands.set_PowerBar_Color(r, g, b, a)
 end
 
 function FuryMonitor.Commands.set_PowerBar_FontColor(r, g, b, a)
-	if not (r and g and b and a) then
-		return false;
-	end
+	local v = false;
+	v, r, g, b, a = FuryMonitor.Validation.ValidateColor(r, g, b, a);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.PowerBar.FontColor.R = r;
 	FuryMonitor.Configuration.PowerBar.FontColor.G = g;
 	FuryMonitor.Configuration.PowerBar.FontColor.B = b;
@@ -394,41 +427,46 @@ function FuryMonitor.Commands.set_PowerBar_FontColor(r, g, b, a)
 end
 
 function FuryMonitor.Commands.set_PowerBar_FontSize(fontSize)
-	if not fontSize then
-		return false
-	end
+	local v = false;
+	v, fontSize = FuryMonitor.Validation.ValidateFontSize(fontSize);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.PowerBar.FontSize = fontSize;
 	return true;
 end
 
 function FuryMonitor.Commands.set_PowerBar_Height(height)
-	if not height then
-		return false;
-	end
+	local v = false;
+	v, height = FuryMonitor.Validation.ValidateDimension(height);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.PowerBar.Height = height;
 	return true;
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Alpha(alpha)
-	if not alpha then
-		return false;
-	end
+	local v = false;
+	v, alpha = FuryMonitor.Validation.ValidateAlpha(alpha);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.AbilityFrame.RageIndicator.Alpha = alpha;
 	return true;
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Height(height)
-	if not height then
-		return false;
-	end
+	local v = false;
+	v, height = FuryMonitor.Validation.ValidateDimension(height);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.AbilityFrame.RageIndicator.Height = height;
 	return true;
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_OnColor(r, g, b, a)
-	if not (r and g and b and a) then
-		return false
-	end
+	local v = false;
+	v, r, g, b, a = FuryMonitor.Validation.ValidateColor(r, g, b, a);
+	if not v then return false; end
+
 	local color = FuryMonitor.Configuration.AbilityFrame.RageIndicator.OnColor;
 	color.R = r;
 	color.G = g;
@@ -438,9 +476,10 @@ function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_OnColor(r, g, b, a)
 end
 
 function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_OffColor(r, g, b, a)
-	if not (r and g and b and a) then
-		return false
-	end
+	local v = false;
+	v, r, g, b, a = FuryMonitor.Validation.ValidateColor(r, g, b, a);
+	if not v then return false; end
+
 	local color = FuryMonitor.Configuration.AbilityFrame.RageIndicator.OffColor;
 	color.R = r;
 	color.G = g;
@@ -467,32 +506,28 @@ function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Width(width)
 end
 
 function FuryMonitor.Commands.set_Tray_Alpha(alpha)
-	if not alpha then
-		return false;
-	end
+	local v = false;
+	v, alpha = FuryMonitor.Validation.ValidateAlpha(alpha);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.Tray.Alpha = alpha;
 	return true;
 end
 
 function FuryMonitor.Commands.set_Tray_Padding(padding)
-	if not padding then
-		return false;
-	end
+	local v = false;
+	v, padding = FuryMonitor.Validation.ValidateDimension(padding);
+	if not v then return false; end
+
 	FuryMonitor.Configuration.Tray.Padding = padding;
 	return true;
 end
 
 function FuryMonitor.Commands.set_RotationDuration(duration)
-	if not duration then
-		return false;
-	end
-	duration = duration + 0;
-	if duration <= 0 then
-		FuryMonitor.Main:GetInstance():PrintMessage(
-			"duration must be greater than 0."
-		);
-		return false;
-	end
+	local v = false;
+	v, duration = FuryMonitor.Validation.ValidateDuration(duration);
+	if not v then return false; end
+
 	if duration ~= FuryMonitor.Util.round(duration) then
 		FuryMonitor.Main:GetInstance():PrintMessage(
 			"duration must be a whole number."
@@ -506,6 +541,14 @@ end
 
 function FuryMonitor.Commands.set_Enabled(enabled)
 	local fm = FuryMonitor.Main:GetInstance();
+	if enabled == nil then
+		fm:PrintMessage((FuryMonitor.Configuration.Enabled
+			and "FuryMonitor disabled.")
+			or "FuryMonitor enabled."
+			);
+		FuryMonitor.Configuration.Enabled = not FuryMonitor.Configuration.Enabled;
+		return true;
+	end
 	if (not enabled) or enabled == "0" or enabled == "false" then
 		FuryMonitor.Configuration.Enabled = false;
 		fm:PrintMessage("FuryMonitor disabled.");
@@ -570,99 +613,103 @@ FuryMonitor.Commands.SlashCommandStructure = {
 	abilityframe = { _d = "Change the settings for AbilityFrames.",
 		alpha = { _d = "Change the transparency of AbilityFrames.",
 			_f = FuryMonitor.Commands.set_AbilityFrame_Alpha,
-			_a = "alpha"
+			_a = "alpha:dec[0,1]"
 		},	
 		fontcolor = { _d = "Change the font color of AbilityFrames.",
 			_f = FuryMonitor.Commands.set_AbilityFrame_FontColor,
-			_a = "r g b a"
+			_a = "r:dec[0,1] g:dec[0,1] b:dec[0,1] a:dec[0,1]"
 		},	
 		fontsize = { _d = "Change the font size of AbilityFrames.",
 			_f = FuryMonitor.Commands.set_AbilityFrame_FontSize,
-			_a = "fontSize"
+			_a = "fontSize:int[8,]"
 		},
 		rageindicator = { _d ="Change the settings for rage indicators.",
 			alpha = { _d = "Change the transparency of the rage indicator.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Alpha,
-				_a = "alpha"
+				_a = "alpha:dec[0,1]"
 			},
 			height = { _d = "Change the height of the rage indicator.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Height,
-				_a = "height"
+				_a = "height:int[1,]"
 			},
 			offcolor = { _d = "Change the OFF color of the rage indicators.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_OffColor,
-				_a = "r g b a"
+				_a = "r:dec[0,1] g:dec[0,1] b:dec[0,1] a:dec[0,1]"
 			},
 			oncolor = { _d = "Change the ON color of the rage indicators.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_OnColor,
-				_a = "r g b a"
+				_a = "r:dec[0,1] g:dec[0,1] b:dec[0,1] a:dec[0,1]"
 			},
 			show = { _d = "Toggle whether or not to show the rage indicators.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Show,
-				_a = "show"
+				_a = "show:bit"
 			},
 			width = { _d = "Change the width of the rage indicators.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Width,
-				_a = "width"
+				_a = "width:int[1,]"
 			}
 		},
 		size = { _d = "Change the size of ability frames.",
 			_f = FuryMonitor.Commands.set_AbilityFrame_Size,
-			_a = "size"
+			_a = "size:int[1,]"
 		}
 	},
 	display = { _d = "Change the overall layout of the mod.",
 		abilityspacing = { _d = "Change the spacing between abilities.",
 			_f = FuryMonitor.Commands.set_Display_AbilitySpacing,
-			_a = "spacing"
+			_a = "spacing:int[0,]"
 		},
-		alpha = { _d = "Change the overall transparency of the mod.",
-			_f = FuryMonitor.Commands.set_Display_Alpha,
-			_a = "alpha"
+		combatalpha = { _d = "Change the transparency of the mod in combat.",
+			_f = FuryMonitor.Commands.set_Display_CombatAlpha,
+			_a = "alpha:dec[0,1]"
 		},
+		idlealpha = { _d = "Change the transparency of the mod out of combat.",
+			_f = FuryMonitor.Commands.set_Display_IdleAlpha,
+			_a = "alpha:dec[0,1]"
+		},	
 		framestrata = { _d = "Change the frame strata used by FuryMonitor.",
 			_f = FuryMonitor.Commands.set_Display_FrameStrata,
-			_a = "string strata"
+			_a = "strata:string"
 		},	
 		padding = { _d = "Adjust the space between the PowerBar and the Tray.",
 			_f = FuryMonitor.Commands.set_Display_Padding,
-			_a = "padding"
+			_a = "padding:int[0,]"
 		},	
 		position = { _d = "Change the position of the monitor.",
 			_f = FuryMonitor.Commands.set_Display_Position,
-			_a = "x y"
+			_a = "x:int[0,] y:int[0,]"
 		}
 	},
 	option = { _d = "Change mod options.",
 		enabled = { _d = "Enable/disable FuryMonitor.",
 			_f = FuryMonitor.Commands.set_Enabled,
-			_a = "enabled"
+			_a = "enabled:bit"
 		},
 		rotationduration = { _d = "Set the number of rotation slots to display.",
 			_f = FuryMonitor.Commands.set_RotationDuration,
-			_a = "duration"
+			_a = "duration:int[1,]"
 		}	
 	},
 	powerbar = { _d = "Change the settings of the PowerBar.",
 		animationtime = { _d = "Change the time it takes for the PowerBar to adjust to new values.",
 			_f = FuryMonitor.Commands.set_PowerBar_AnimationTime,
-			_a = "time"
+			_a = "time:dec[0,]"
 		},
 		color = { _d = "Change the color of the PowerBar.",
 			_f = FuryMonitor.Commands.set_PowerBar_Color,
-			_a = "r g b a"
+			_a = "r:dec[0,1] g:dec[0,1] b:dec[0,1] a:dec[0,1]"
 		},
 		fontcolor = { _d = "Change the font color of the PowerBar.",
 			_f = FuryMonitor.Commands.set_PowerBar_FontColor,
-			_a = "r g b a"
+			_a = "r:dec[0,1] g:dec[0,1] b:dec[0,1] a:dec[0,1]"
 		},	
 		fontsize = { _d = "Change the font size of the PowerBar.",
 			_f = FuryMonitor.Commands.set_PowerBar_FontSize,
-			_a = "fontSize"
+			_a = "fontSize:int[8,]"
 		},
 		height = { _d = "Change the height of the PowerBar.",
 			_f = FuryMonitor.Commands.set_PowerBar_Height,
-			_a = "height"
+			_a = "height:int[1,]"
 		},
 		texture = { _d = "(EXPERTS ONLY) Change the texture of the powerbar.",
 			_f = FuryMonitor.Commands.set_PowerBar_BackgroundFile,
@@ -672,11 +719,11 @@ FuryMonitor.Commands.SlashCommandStructure = {
 	tray = { _d = "Change the settings of the Tray.",
 		alpha = { _d = "Change the alpha transparency of the tray.",
 			_f = FuryMonitor.Commands.set_Tray_Alpha,
-			_a = "alpha"
+			_a = "alpha:dec[0,1]"
 		},
 		padding = { _d = "Change the padding of the tray.",
 			_f = FuryMonitor.Commands.set_Tray_Padding,
-			_a = "padding"
+			_a = "padding:int[0,]"
 		}
 	}
 };

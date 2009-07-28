@@ -7,7 +7,8 @@ http://sam.zoy.org/wtpl/COPYING for more details.
 ]]--
 
 FuryMonitor.Configuration = {
-	Version = 				000301,
+	Version = 				000302,
+	OldestCompatible =		000301,
 	AbilityFrame = {
 		Width = 			30,
 		Height =			30,
@@ -54,11 +55,14 @@ FuryMonitor.Configuration = {
 		Padding =				1
 	},
 	Display = {
-		Alpha =				1,
-		AbilitySpacing =	3,
-		FrameStrata =		"BACKGROUND",
-		Padding =			4,
-		Position = 			{ X = 1, Y = 1 }	
+		CombatAlpha =				0.9,
+		IdleAlpha =					0.4,
+		Alpha =						0.1,
+		AlphaFadeDuration =			1,
+		AbilitySpacing =			3,
+		FrameStrata =				"BACKGROUND",
+		Padding =					4,
+		Position = 					{ X = 200, Y = 200 }	
 	},
 	Enabled = true,
 	RotationDuration = 9 * 1.5

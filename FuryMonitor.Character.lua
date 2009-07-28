@@ -63,7 +63,7 @@ end
 function FuryMonitor.Character:GetMainHandWeaponDamage()
 	-- Returns the unmodified average damage of the weapon equipped in the main hand
 	return self:GetMainHandDamage()
-		/ (1 + 0.02 * self:GetTalent("Two-Handed Weapon Specialization"):GetRank())
+		/ (1 + 0.02 * self:GetTalent(FuryMonitor.Localization.Localize("Two-Handed Weapon Specialization")):GetRank())
 		- self:GetAttackPower() * self:GetMainHandWeaponSpeed() / 14
 		;
 end
@@ -75,14 +75,15 @@ function FuryMonitor.Character:GetMainHandNormalizedSpeed()
 	end
 
 	local _, _, _, _, _, _, weaponType = GetItemInfo(weaponLink);
-	
-	if FuryMonitor.Util.str_contains(weaponType, "Two-Handed") then
+	local L = FuryMonitor.Localization.Localize;
+
+	if FuryMonitor.Util.str_contains(weaponType, L("Two-Handed")) then
 		return 3.3;
 	end
-	if FuryMonitor.Util.str_contains(weaponType, "One-handed") then
+	if FuryMonitor.Util.str_contains(weaponType, L("One-handed")) then
 		return 2.4;
 	end
-	if FuryMonitor.Util.str_contains(weaponType, "Dagger") then
+	if FuryMonitor.Util.str_contains(weaponType, L("Dagger")) then
 		return 1.8;
 	end
 	return 2.4;
@@ -109,9 +110,11 @@ function FuryMonitor.Character:GetOffHandWeaponDamage()
 		return 0;
 	end	
 
+	local L = FuryMonitor.Localization.Localize;
+
 	return oh_damage
-		/ (1 + 0.02 * self:GetTalent("Two-Handed Weapon Specialization"):GetRank())
-		/ (1 + 0.05 * self:GetTalent("Dual Wield Specialization"):GetRank())
+		/ (1 + 0.02 * self:GetTalent(L("Two-Handed Weapon Specialization")):GetRank())
+		/ (1 + 0.05 * self:GetTalent(L("Dual Wield Specialization")):GetRank())
 		/ 0.5
 		- self:GetAttackPower() * self:GetOffHandWeaponSpeed() / 14;
 end
@@ -124,13 +127,15 @@ function FuryMonitor.Character:GetOffHandNormalizedSpeed()
 
 	local _, _, _, _, _, _, weaponType = GetItemInfo(weaponLink);
 	
-	if FuryMonitor.Util.str_contains(weaponType, "Two-Handed") then
+	local L = FuryMonitor.Localization.Localize;
+
+	if FuryMonitor.Util.str_contains(weaponType, L("Two-Handed")) then
 		return 3.3;
 	end
-	if FuryMonitor.Util.str_contains(weaponType, "One-Handed") then
+	if FuryMonitor.Util.str_contains(weaponType, L("One-Handed")) then
 		return 2.4;
 	end
-	if FuryMonitor.Util.str_contains(weaponType, "Dagger") then
+	if FuryMonitor.Util.str_contains(weaponType, L("Dagger")) then
 		return 1.8;
 	end
 	return 2.4;

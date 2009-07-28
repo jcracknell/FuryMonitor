@@ -46,10 +46,11 @@ function FuryMonitor.Ability:new(params)
 		-- a) Is instant
 		-- b) Has no cooldown
 		-- c) Is on the global cooldown
-		instance._name = "Hamstring";
+		instance._name = FuryMonitor.Localization.Localize("Hamstring");
 		instance._cooldown = instance:GetCharacter():GetGlobalCooldown();
 	end
 	FuryMonitor.Ability.Instances[instance:GetName()] = instance;
+
 	return instance;
 end
 
@@ -159,12 +160,11 @@ function FuryMonitor.Ability:GetSpellNumber()
 		local foundNum = nil;
 		local num = 1;
 		while true do
-			local name, rank = GetSpellName(num, BOOKTYPE_SPELL);
+			local name, _ = GetSpellName(num, BOOKTYPE_SPELL);
 			if not name then do break end end
 
 			if name == self:GetName() then
 				foundNum = num;
-				do break end
 			end	
 	
 			num = num + 1
@@ -172,9 +172,10 @@ function FuryMonitor.Ability:GetSpellNumber()
 		if not foundNum then
 			return nil;
 		end	
+
 		self._spellNumber = foundNum;
 	end
-
+	
 	return self._spellNumber;
 end
 
@@ -270,7 +271,7 @@ end
 
 function FuryMonitor.Ability:GetReactiveUsesRemaining()
 	return math.max(0, self:GetReactiveUses() - self:GetTheoreticalUses());
-end
+end 
 
 function FuryMonitor.Ability:GetReactiveUses()
 	return self._reactiveUses;
@@ -282,4 +283,10 @@ end
 
 function FuryMonitor.Ability:SetTheoreticalUses(value)
 	self._theoreticalUses = value;
+end
+
+function FuryMonitor.Ability:OnTalentsChanged()
+	-- Clear the cached spell number, as the spell numbers change during
+	-- talent changes
+	self._spellNumber = nil;
 end

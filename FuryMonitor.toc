@@ -1,16 +1,18 @@
-## Interface: 30000
+## Interface: 30100
 ## Title: FuryMonitor
 ## Author: Korlong <BAD>, Demon Soul (US)
 ## Notes: Monitors character stats and proposes ability rotations in real time.
 ## SavedVariables: FuryMonitor_SavedConfiguration 
 FuryMonitor.lua
 FuryMonitor.Configuration.lua
+FuryMonitor.Localization.lua
 FuryMonitor.Talent.lua
 FuryMonitor.Character.lua
 FuryMonitor.Ability.lua
 FuryMonitor.RotationItem.lua
 FuryMonitor.AbilityFrame.lua
 FuryMonitor.PowerBar.lua
+FuryMonitor.Validation.lua
 FuryMonitor.Commands.lua
 FuryMonitor.Abilities.lua
 FuryMonitor.Main.lua

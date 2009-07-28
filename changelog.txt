@@ -1,4 +1,10 @@
-0.3.1 - 2009-02-20
-Fixed Whirlwind damage calculation so that attack power for the offhand weapon is no longer included when using a single weapon
-Fixed stacking of rage indicators, previously they were under the ability frames, making them hard to see.
-Bloodthirst no longer incorrectly applies Two-Handed Weapon Specialization to its damage
+0.3.2b1 -
+FuryMonitor can now be configured to fade in/out when you enter/leave combat. This is accomplished by specifying a combat and idle alpha value for the mod. This feature is enabled by default, however in order to avoid inane numbers of messages about how the mod "dissapeared", the default idle alpha value is quite visible. To modify this behavior, you can use the following commands: 
+	/fm display combatalpha 
+	/fm display idlealpha
+The "display alpha" command and associated configuration setting has been removed.
+Configuration options that are compatible with new versions of FuryMonitor are no longer replaced with default configuration values. Default configuration values are used for values not present in saved user configurations.
+Added localization methods and support for german (deDE) locale. Special thanks to Ilone on tankspot.com for providing german localization and incentive. I am looking for help with other locales. The best approach would be to "just do it" and then get the updated FuryMonitor.Localization.lua to me somehow.
+Fixed a bug where the wrong spell textures would be displayed after respeccing. Additionally, FuryMonitor.AbilityFrames.Active now uses reference keys instead of keying on spellId.
+Rage indicators now correctly disappear when their ability disappears.
+All configuration commands now show the input types of parameters, as well as valid input ranges. All configuration commands with number-valued parameters now have appropriate validation for input values.

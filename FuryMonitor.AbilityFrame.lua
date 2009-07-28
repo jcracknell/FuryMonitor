@@ -49,13 +49,14 @@ function FuryMonitor.AbilityFrame:new(ability, useId, time, parentFrame, rageSta
 	instance:LoadFrameConfiguration();
 
 	-- Add the instance to the table of active instances
-	if not FuryMonitor.AbilityFrame.Active[instance:GetAbility():GetSpellNumber()] then
-		FuryMonitor.AbilityFrame.Active[instance:GetAbility():GetSpellNumber()] = {};
+	if not FuryMonitor.AbilityFrame.Active[instance:GetAbility()] then
+		FuryMonitor.AbilityFrame.Active[instance:GetAbility()] = {};
 	end
-	FuryMonitor.AbilityFrame.Active[instance:GetAbility():GetSpellNumber()][instance:GetUseId()]
+	FuryMonitor.AbilityFrame.Active[instance:GetAbility()][instance:GetUseId()]
 		= instance;
 
 	-- Set up event subscriptions
+	FuryMonitor.Main:GetInstance():SubscribeToAlphaChanges(instance);
 	FuryMonitor.Main:GetInstance():SubscribeToConfigurationChanges(instance);	
 	FuryMonitor.Main:GetInstance():SubscribeToStatChanges(instance);
 
@@ -72,10 +73,26 @@ function FuryMonitor.AbilityFrame:recycle()
 	-- Add this to the inactive list
 	table.insert(FuryMonitor.AbilityFrame.Inactive, self);
 	-- Remove this from the active list
-	FuryMonitor.AbilityFrame.Active[self:GetAbility():GetSpellNumber()][self:GetUseId()] = nil;
+	FuryMonitor.AbilityFrame.Active[self:GetAbility()][self:GetUseId()] = nil;
 
 	self:GetIconFrame():Hide();
 	self:GetDamageText():Hide();
+	self:GetRageIndicatorFrame():Hide();
+end
+
+function FuryMonitor.AbilityFrame:OnAlphaChanged()
+	self:GetIconFrame():SetAlpha(
+		FuryMonitor.Configuration.AbilityFrame.Alpha
+		* FuryMonitor.Configuration.Display.Alpha
+	);	
+	self:GetRageIndicatorFrame():SetAlpha(
+		FuryMonitor.Configuration.AbilityFrame.RageIndicator.Alpha
+		* FuryMonitor.Configuration.Display.Alpha
+	);	
+	self:GetDamageText():SetAlpha(
+		FuryMonitor.Configuration.AbilityFrame.FontColor.A
+		* FuryMonitor.Configuration.Display.Alpha
+	);	
 end
 
 function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
@@ -98,10 +115,6 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 			right = FuryMonitor.Configuration.AbilityFrame.BackgroundInset
 		}
 	});
-	self:GetIconFrame():SetAlpha(
-		FuryMonitor.Configuration.AbilityFrame.Alpha
-		* FuryMonitor.Configuration.Display.Alpha
-	);
 	self:GetIconFrame():SetFrameStrata(FuryMonitor.Configuration.AbilityFrame.FrameStrata);
 	if FuryMonitor.Configuration.Enabled then
 		self:GetIconFrame():Show();
@@ -135,9 +148,6 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 		FuryMonitor.Configuration.AbilityFrame.FrameStrata
 	);
 	self:UpdateRageIndicator();
-	self:GetRageIndicatorFrame():SetAlpha(
-		FuryMonitor.Configuration.AbilityFrame.RageIndicator.Alpha
-	);
 	if FuryMonitor.Configuration.AbilityFrame.RageIndicator.Show
 		and FuryMonitor.Configuration.Enabled and not self:GetAbility():IsFake() then
 		self:GetRageIndicatorFrame():Show();
@@ -154,9 +164,7 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 	self:GetDamageText():SetTextColor(
 		FuryMonitor.Configuration.AbilityFrame.FontColor.R,
 		FuryMonitor.Configuration.AbilityFrame.FontColor.G,
-		FuryMonitor.Configuration.AbilityFrame.FontColor.B,
-		FuryMonitor.Configuration.AbilityFrame.FontColor.A
-		* FuryMonitor.Configuration.Display.Alpha
+		FuryMonitor.Configuration.AbilityFrame.FontColor.B
 	);
 	self:GetDamageText():SetPoint("TOP", self:GetIconFrame(), "CENTER", 0,
 		- FuryMonitor.Util.round(FuryMonitor.Configuration.AbilityFrame.Height * 0.5)
@@ -168,6 +176,9 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 	else
 		self:GetDamageText():Hide();
 	end
+
+	-- Update alpha
+	self:OnAlphaChanged();
 end
 
 function FuryMonitor.AbilityFrame:OnConfigurationChanged()
@@ -227,12 +238,12 @@ function FuryMonitor.AbilityFrame:UpdateRageIndicator()
 	);
 end
 
-function FuryMonitor.AbilityFrame:GetAbilityFrame(spellNumber, useNumber)
-	if (not FuryMonitor.AbilityFrame.Active[spellNumber])
-		or (not FuryMonitor.AbilityFrame.Active[spellNumber][useNumber]) then
+function FuryMonitor.AbilityFrame:GetAbilityFrame(ability, useNumber)
+	if (not FuryMonitor.AbilityFrame.Active[ability])
+		or (not FuryMonitor.AbilityFrame.Active[ability][useNumber]) then
 		return nil;
 	end
-	return FuryMonitor.AbilityFrame.Active[spellNumber][useNumber]
+	return FuryMonitor.AbilityFrame.Active[ability][useNumber]
 end
 
 function FuryMonitor.AbilityFrame:GetAbility()
