@@ -52,8 +52,8 @@ function FuryMonitor.Main:GetInstance()
 				UNIT_SPELLCAST_SUCCEEDED = function(fm) fm:OnSpellCast() end,
 				CHARACTER_POINTS_CHANGED = function(fm) fm:OnTalentsChanged() end,
 				UPDATE_SHAPESHIFT_FORM = function(fm) fm:OnStatsChanged() end,
-				PLAYER_ENTER_COMBAT = function(fm) fm:OnEnterCombat() end,
-				PLAYER_LEAVE_COMBAT = function(fm) fm:OnLeaveCombat() end
+				PLAYER_REGEN_DISABLED = function(fm) fm:OnEnterCombat() end,
+				PLAYER_REGEN_ENABLED = function(fm) fm:OnLeaveCombat() end
 			}
 		};
 		self._instance = setmetatable(members, FuryMonitor.Main);

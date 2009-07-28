@@ -1,4 +1,4 @@
-0.3.2b1 -
+0.3.2b2 -
 FuryMonitor can now be configured to fade in/out when you enter/leave combat. This is accomplished by specifying a combat and idle alpha value for the mod. This feature is enabled by default, however in order to avoid inane numbers of messages about how the mod "dissapeared", the default idle alpha value is quite visible. To modify this behavior, you can use the following commands: 
 	/fm display combatalpha 
 	/fm display idlealpha
