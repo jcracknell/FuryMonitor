@@ -74,10 +74,13 @@ end
 		end
 		if not result then
 			FuryMonitor.Main:GetInstance():PrintMessage(
-				"Command execution failed. Did you specify the correct parameters?"
+				"|cB3FF3333Command execution failed. Did you specify the correct parameters?"
 			);
 		else
 			-- Propagate configuration changes
+			FuryMonitor.Main:GetInstance():PrintMessage(
+				"|cB333FF33Command succeded."
+			);
 			FuryMonitor.Main:GetInstance():OnConfigurationChanged();
 		end
 	end
@@ -444,15 +447,6 @@ function FuryMonitor.Commands.set_PowerBar_Height(height)
 	return true;
 end
 
-function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Alpha(alpha)
-	local v = false;
-	v, alpha = FuryMonitor.Validation.ValidateAlpha(alpha);
-	if not v then return false; end
-
-	FuryMonitor.Configuration.AbilityFrame.RageIndicator.Alpha = alpha;
-	return true;
-end
-
 function FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Height(height)
 	local v = false;
 	v, height = FuryMonitor.Validation.ValidateDimension(height);
@@ -624,10 +618,6 @@ FuryMonitor.Commands.SlashCommandStructure = {
 			_a = "fontSize:int[8,]"
 		},
 		rageindicator = { _d ="Change the settings for rage indicators.",
-			alpha = { _d = "Change the transparency of the rage indicator.",
-				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Alpha,
-				_a = "alpha:dec[0,1]"
-			},
 			height = { _d = "Change the height of the rage indicator.",
 				_f = FuryMonitor.Commands.set_AbilityFrame_RageIndicator_Height,
 				_a = "height:int[1,]"
@@ -666,6 +656,10 @@ FuryMonitor.Commands.SlashCommandStructure = {
 		idlealpha = { _d = "Change the transparency of the mod out of combat.",
 			_f = FuryMonitor.Commands.set_Display_IdleAlpha,
 			_a = "alpha:dec[0,1]"
+		},	
+		alphafadeduration = { _d = "Change the fade duration when transitioning combat state.",
+			_f = FuryMonitor.Commands.set_Display_AlphaFadeDuration,
+			_a = "duration:dec[0,]"
 		},	
 		framestrata = { _d = "Change the frame strata used by FuryMonitor.",
 			_f = FuryMonitor.Commands.set_Display_FrameStrata,

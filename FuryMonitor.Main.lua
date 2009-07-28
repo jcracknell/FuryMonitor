@@ -34,8 +34,8 @@ function FuryMonitor.Main:GetInstance()
 			_rotationStabilized = false,
 			_combatState = false,
 			_combatTransitionTime = 0,
+			_currentAlpha = nil,
 			_subscribers = {
-				OnAlphaChanged = {},
 				OnConfigurationChanged = {},
 				OnTalentsChanged = {},
 				OnEquipmentChanged = {},
@@ -63,8 +63,9 @@ function FuryMonitor.Main:GetInstance()
 			self._instance:SubscribeToTalentChanges(ability);
 		end
 
-		FuryMonitor.Configuration.Display.Alpha
-			= FuryMonitor.Configuration.Display.IdleAlpha;
+		self._instance:SetCurrentAlpha(FuryMonitor.Configuration.Display.CombatAlpha);	
+		self._instance:SetCombatState(false);
+		self._instance:SetCombatTransitionTime(GetTime());
 	end
 	return self._instance;
 end
@@ -191,6 +192,14 @@ function FuryMonitor.Main:SetCombatTransitionTime(value)
 	self._combatTransitionTime = value;
 end
 
+function FuryMonitor.Main:GetCurrentAlpha()
+	return self._currentAlpha;
+end
+
+function FuryMonitor.Main:SetCurrentAlpha(value)
+	self._currentAlpha = value;
+end
+
 -------------------------------------------------
 -- END GETTERS/SETTERS
 -------------------------------------------------
@@ -198,14 +207,6 @@ end
 -------------------------------------------------
 -- BEGIN FUNCTIONS
 -------------------------------------------------
-
-function FuryMonitor.Main:SubscribeToAlphaChanges(subscriber)
-	self._subscribers.OnAlphaChanged[subscriber] = true;
-end
-
-function FuryMonitor.Main:UnSubscribeToAlphaChanges(subscriber)
-	self._subscribers.OnAlphaChanged[subscriber] = nil;
-end
 
 function FuryMonitor.Main:SubscribeToConfigurationChanges(subscriber)
 	self._subscribers.OnConfigurationChanged[subscriber] = true;
@@ -258,6 +259,11 @@ function FuryMonitor.Main:LoadFrameConfiguration()
 		FuryMonitor.Configuration.Display.Position.X,
 		-FuryMonitor.Configuration.Display.Position.Y
 	);	
+	self:GetFrame():SetAlpha(
+		(self:GetCombatState()
+			and FuryMonitor.Configuration.Display.CombatAlpha)
+			or FuryMonitor.Configuration.Display.IdleAlpha
+	);	
 	if FuryMonitor.Configuration.Enabled then
 		self:GetFrame():Show();
 	else
@@ -266,6 +272,9 @@ function FuryMonitor.Main:LoadFrameConfiguration()
 
 	-- Configure tray
 	self:GetRotationTrayFrame():SetFrameStrata(FuryMonitor.Configuration.Display.FrameStrata);
+	self:GetRotationTrayFrame():SetFrameLevel(
+		FuryMonitor.Configuration.Display.FrameLevel
+	);	
 	self:GetRotationTrayFrame():SetWidth(
 		FuryMonitor.Configuration.Tray.BackgroundInset
 		+ FuryMonitor.Configuration.Tray.Padding
@@ -295,7 +304,6 @@ function FuryMonitor.Main:LoadFrameConfiguration()
 	});
 	self:GetRotationTrayFrame():SetAlpha(
 		FuryMonitor.Configuration.Tray.Alpha
-		* FuryMonitor.Configuration.Display.Alpha
 	);
 	self:GetRotationTrayFrame():SetPoint("TOPLEFT", self:GetFrame(), "TOPLEFT",
 		0,
@@ -567,43 +575,47 @@ function FuryMonitor.Main:CombatFade()
 		< FuryMonitor.Configuration.Display.AlphaFadeDuration
 	-- Do one last update if the transition is over to make sure the transition
 	-- fully completed (Alpha = Idle/CombatAlpha)
-	or (FuryMonitor.Configuration.Display.Alpha 
+	or (self:GetCurrentAlpha()
 		~= ((self:GetCombatState() and combatAlpha) or idleAlpha))
 	then
-		local transitionProgress = math.min(1,
-			(FuryMonitor.Util.GetTime() - self:GetCombatTransitionTime())
-			/ FuryMonitor.Configuration.Display.AlphaFadeDuration
-		);
+		local transitionProgress = FuryMonitor.Util.round(
+			math.min(1,
+				(FuryMonitor.Util.GetTime() - self:GetCombatTransitionTime())
+				/ FuryMonitor.Configuration.Display.AlphaFadeDuration
+			)
+			* 20,
+			0 -- 0 digits
+		) / 20;
+		-- This minimizes the number of alpha updates to 20 frames of animation
 		
 		local distance = combatAlpha - idleAlpha;
 		
-		FuryMonitor.Configuration.Display.Alpha
-			= (self:GetCombatState()
+		local newAlpha = (self:GetCombatState()
 				and (idleAlpha + transitionProgress * distance))
 				or (combatAlpha - transitionProgress * distance)
 			;	
 		
+		if newAlpha == self:GetCurrentAlpha() then
+			-- We don't need to update alpha this frame
+			return;
+		end	
+
+		self:SetCurrentAlpha(newAlpha);
+		
 		-- Fix any rounding errors that may occur
 		if math.abs(((self:GetCombatState() and combatAlpha) or idleAlpha)
-			- FuryMonitor.Configuration.Display.Alpha)
+			- self:GetCurrentAlpha())
 			< 0.01
 		then
-			FuryMonitor.Configuration.Display.Alpha
-				= (self:GetCombatState() and combatAlpha) or idleAlpha;
+			self:SetCurrentAlpha((self:GetCombatState() and combatAlpha) or idleAlpha);
 		end
 
-		self:GetRotationTrayFrame():SetAlpha(
-			FuryMonitor.Configuration.Tray.Alpha
-			* FuryMonitor.Configuration.Display.Alpha
-		);	
-		-- Notify subscribers that the alpha value has changed
-		for subscriber, _ in pairs(self._subscribers.OnAlphaChanged) do
-			subscriber:OnAlphaChanged();
-		end
+		self:GetFrame():SetAlpha(self:GetCurrentAlpha());
 	end
 end
 
 function FuryMonitor.Main:Redraw()
+	-- Handle fading in/out on combat status change
 	self:CombatFade();
 
 	if self:GetRotationStabilized() then

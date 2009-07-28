@@ -19,9 +19,7 @@ FuryMonitor.Configuration = {
 		FontColor = 		{ R = 1, G = 1, B = 1, A = 1 },
 		FontFile =			"Fonts\\FRIZQT__.ttf",
 		FontSize =			11,
-		FrameStrata =		"LOW",
 		RageIndicator = {
-			Alpha = 			1,
 			Width =				30,
 			Height =			10,
 			BackgroundFile =	"Interface\\TargetingFrame\\UI-StatusBar",
@@ -55,12 +53,12 @@ FuryMonitor.Configuration = {
 		Padding =				1
 	},
 	Display = {
-		CombatAlpha =				0.9,
+		CombatAlpha =				1,
 		IdleAlpha =					0.4,
-		Alpha =						0.1,
 		AlphaFadeDuration =			1,
 		AbilitySpacing =			3,
 		FrameStrata =				"BACKGROUND",
+		FrameLevel =				1,
 		Padding =					4,
 		Position = 					{ X = 200, Y = 200 }	
 	},

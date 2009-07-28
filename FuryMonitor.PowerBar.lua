@@ -32,7 +32,6 @@ function FuryMonitor.PowerBar:GetInstance(character, parentFrame)
 	self._instance:CreateFrames();
 	self._instance:LoadFrameConfiguration();
 
-	FuryMonitor.Main:GetInstance():SubscribeToAlphaChanges(self._instance);
 	FuryMonitor.Main:GetInstance():SubscribeToConfigurationChanges(self._instance);
 	FuryMonitor.Main:GetInstance():SubscribeToStatChanges(self._instance);
 	FuryMonitor.Main:GetInstance():SubscribeToUpdates(self._instance);
@@ -45,29 +44,11 @@ end
 		self:SetBackgroundFrame(CreateFrame("Frame", nil, self:GetParentFrame()));
 		
 		-- Create status frame
-		self:SetStatusFrame(CreateFrame("FRAME", nil, self:GetParentFrame()));--, nil, self:GetBackgroundFrame()));
+		self:SetStatusFrame(CreateFrame("FRAME", nil, self:GetParentFrame()));
 
 		-- Create status text
 		self._text = self:GetStatusFrame():CreateFontString(nil);
 	end
-
-function FuryMonitor.PowerBar:OnAlphaChanged()
-	self:GetBackgroundFrame():SetAlpha(
-		FuryMonitor.Configuration.PowerBar.Color.A
-		* FuryMonitor.Configuration.Display.Alpha
-	);	
-	self:GetStatusFrame():SetBackdropColor(
-		FuryMonitor.Configuration.PowerBar.Color.R,
-		FuryMonitor.Configuration.PowerBar.Color.G,
-		FuryMonitor.Configuration.PowerBar.Color.B,
-		FuryMonitor.Configuration.PowerBar.Color.A
-		* FuryMonitor.Configuration.Display.Alpha
-	);	
-	self._text:SetAlpha(
-		FuryMonitor.Configuration.PowerBar.FontColor.A
-		* FuryMonitor.Configuration.Display.Alpha
-	);	
-end
 
 function FuryMonitor.PowerBar:OnUpdate(force)
 	if force or self:GetCurrentLevel() ~= self:GetTargetLevel() then
@@ -119,6 +100,9 @@ function FuryMonitor.PowerBar:LoadFrameConfiguration()
 		}
 	});
 	self:GetBackgroundFrame():SetFrameStrata(FuryMonitor.Configuration.Display.FrameStrata);
+	self:GetBackgroundFrame():SetFrameLevel(
+		FuryMonitor.Configuration.Display.FrameLevel
+	);	
 	self:GetBackgroundFrame():SetWidth(
 		FuryMonitor.Configuration.PowerBar.BackgroundInset
 		+ self:GetWidth()
@@ -126,6 +110,7 @@ function FuryMonitor.PowerBar:LoadFrameConfiguration()
 	);
 	self:GetBackgroundFrame():SetHeight(FuryMonitor.Configuration.PowerBar.Height);
 	self:GetBackgroundFrame():SetPoint("TOPLEFT");
+	self:GetBackgroundFrame():SetAlpha(FuryMonitor.Configuration.PowerBar.Color.A);
 	if FuryMonitor.Configuration.Enabled then
 		self:GetBackgroundFrame():Show();
 	else
@@ -134,6 +119,9 @@ function FuryMonitor.PowerBar:LoadFrameConfiguration()
 
 	-- Set up status frame
 	self:GetStatusFrame():SetFrameStrata(FuryMonitor.Configuration.Display.FrameStrata);
+	self:GetStatusFrame():SetFrameLevel(
+		FuryMonitor.Configuration.Display.FrameLevel
+	);	
 	self:GetStatusFrame():SetBackdrop({
 		bgFile = FuryMonitor.Configuration.PowerBar.BackgroundFile,
 		tile = 0
@@ -150,7 +138,8 @@ function FuryMonitor.PowerBar:LoadFrameConfiguration()
 	self:GetStatusFrame():SetBackdropColor(
 		FuryMonitor.Configuration.PowerBar.Color.R,
 		FuryMonitor.Configuration.PowerBar.Color.G,
-		FuryMonitor.Configuration.PowerBar.Color.B
+		FuryMonitor.Configuration.PowerBar.Color.B,
+		FuryMonitor.Configuration.PowerBar.Color.A
 	);	
 	if FuryMonitor.Configuration.Enabled then
 		self:GetStatusFrame():Show();
@@ -167,7 +156,8 @@ function FuryMonitor.PowerBar:LoadFrameConfiguration()
 	self._text:SetTextColor(
 		FuryMonitor.Configuration.PowerBar.FontColor.R,
 		FuryMonitor.Configuration.PowerBar.FontColor.G,
-		FuryMonitor.Configuration.PowerBar.FontColor.B
+		FuryMonitor.Configuration.PowerBar.FontColor.B,
+		FuryMonitor.Configuration.PowerBar.FontColor.A
 	);	
 	self._text:SetPoint("CENTER", self:GetBackgroundFrame(), "CENTER");
 	if FuryMonitor.Configuration.Enabled then
@@ -175,8 +165,6 @@ function FuryMonitor.PowerBar:LoadFrameConfiguration()
 	else
 		self._text:Hide();
 	end
-
-	self:OnAlphaChanged();
 
 	-- Force a redraw
 	self:OnUpdate(true);

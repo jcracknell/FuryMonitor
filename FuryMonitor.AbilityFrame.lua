@@ -18,15 +18,19 @@ function FuryMonitor.AbilityFrame:new(ability, useId, time, parentFrame, rageSta
 		instance = FuryMonitor.AbilityFrame.Inactive[#FuryMonitor.AbilityFrame.Inactive];
 		table.remove(FuryMonitor.AbilityFrame.Inactive, #FuryMonitor.AbilityFrame.Inactive);
 	else
+		local fm = FuryMonitor.Main:GetInstance();
+
 		-- We've run out of frames, so create a new one
-		local rageIndicatorFrame = CreateFrame("Frame", nil, UIParent);
-		local iconFrame = CreateFrame("Frame", nil, UIParent);
-		local text = iconFrame:CreateFontString(nil);
+		local iconFrame = CreateFrame("Frame", nil, fm:GetFrame());
+		local rageIndicatorFrame = CreateFrame("Frame", nil, fm:GetFrame());
+		local damageTextFrame = CreateFrame("Frame", nil, fm:GetFrame());
+		local text = damageTextFrame:CreateFontString(nil);
 
 		local members = {
 			_ability = nil,
 			_time = nil,
 			_iconFrame = iconFrame,
+			_damageTextFrame = damageTextFrame,
 			_damageText = text,
 			_rageIndicatorFrame = rageIndicatorFrame,
 			_rageStatus = nil,
@@ -56,7 +60,6 @@ function FuryMonitor.AbilityFrame:new(ability, useId, time, parentFrame, rageSta
 		= instance;
 
 	-- Set up event subscriptions
-	FuryMonitor.Main:GetInstance():SubscribeToAlphaChanges(instance);
 	FuryMonitor.Main:GetInstance():SubscribeToConfigurationChanges(instance);	
 	FuryMonitor.Main:GetInstance():SubscribeToStatChanges(instance);
 
@@ -80,21 +83,6 @@ function FuryMonitor.AbilityFrame:recycle()
 	self:GetRageIndicatorFrame():Hide();
 end
 
-function FuryMonitor.AbilityFrame:OnAlphaChanged()
-	self:GetIconFrame():SetAlpha(
-		FuryMonitor.Configuration.AbilityFrame.Alpha
-		* FuryMonitor.Configuration.Display.Alpha
-	);	
-	self:GetRageIndicatorFrame():SetAlpha(
-		FuryMonitor.Configuration.AbilityFrame.RageIndicator.Alpha
-		* FuryMonitor.Configuration.Display.Alpha
-	);	
-	self:GetDamageText():SetAlpha(
-		FuryMonitor.Configuration.AbilityFrame.FontColor.A
-		* FuryMonitor.Configuration.Display.Alpha
-	);	
-end
-
 function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 	-- Set up the icon frame
 	self:GetIconFrame():SetWidth(FuryMonitor.Configuration.AbilityFrame.Width);
@@ -115,7 +103,14 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 			right = FuryMonitor.Configuration.AbilityFrame.BackgroundInset
 		}
 	});
-	self:GetIconFrame():SetFrameStrata(FuryMonitor.Configuration.AbilityFrame.FrameStrata);
+	self:GetIconFrame():SetAlpha(
+		FuryMonitor.Configuration.AbilityFrame.Alpha
+	);	
+	self:GetIconFrame():SetFrameStrata(FuryMonitor.Configuration.Display.FrameStrata);
+	self:GetIconFrame():SetFrameLevel(
+		FuryMonitor.Configuration.Display.FrameLevel
+		+ 2
+	);
 	if FuryMonitor.Configuration.Enabled then
 		self:GetIconFrame():Show();
 	else
@@ -144,8 +139,10 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 		self:GetIconFrame(),
 		FuryMonitor.Configuration.AbilityFrame.RageIndicator.Position
 	);
-	self:GetRageIndicatorFrame():SetFrameStrata(
-		FuryMonitor.Configuration.AbilityFrame.FrameStrata
+	self:GetRageIndicatorFrame():SetFrameStrata(FuryMonitor.Configuration.Display.FrameStrata);
+	self:GetRageIndicatorFrame():SetFrameLevel(
+		FuryMonitor.Configuration.Display.FrameLevel
+		+ 3
 	);
 	self:UpdateRageIndicator();
 	if FuryMonitor.Configuration.AbilityFrame.RageIndicator.Show
@@ -156,6 +153,11 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 	end
 
 	-- Set up damage text
+	self:GetDamageTextFrame():SetFrameStrata(FuryMonitor.Configuration.Display.FrameStrata);
+	self:GetDamageTextFrame():SetFrameLevel(
+		FuryMonitor.Configuration.Display.FrameLevel
+		+ 4
+	);	
 	self:GetDamageText():SetFont(
 		FuryMonitor.Configuration.AbilityFrame.FontFile,
 		FuryMonitor.Configuration.AbilityFrame.FontSize,
@@ -164,7 +166,8 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 	self:GetDamageText():SetTextColor(
 		FuryMonitor.Configuration.AbilityFrame.FontColor.R,
 		FuryMonitor.Configuration.AbilityFrame.FontColor.G,
-		FuryMonitor.Configuration.AbilityFrame.FontColor.B
+		FuryMonitor.Configuration.AbilityFrame.FontColor.B,
+		FuryMonitor.Configuration.AbilityFrame.FontColor.A
 	);
 	self:GetDamageText():SetPoint("TOP", self:GetIconFrame(), "CENTER", 0,
 		- FuryMonitor.Util.round(FuryMonitor.Configuration.AbilityFrame.Height * 0.5)
@@ -176,9 +179,6 @@ function FuryMonitor.AbilityFrame:LoadFrameConfiguration()
 	else
 		self:GetDamageText():Hide();
 	end
-
-	-- Update alpha
-	self:OnAlphaChanged();
 end
 
 function FuryMonitor.AbilityFrame:OnConfigurationChanged()
@@ -233,8 +233,7 @@ function FuryMonitor.AbilityFrame:UpdateRageIndicator()
 		color = FuryMonitor.Configuration.AbilityFrame.RageIndicator.OffColor;
 	end
 	self:GetRageIndicatorFrame():SetBackdropColor(
-		color.R, color.G, color.B,
-		color.A * FuryMonitor.Configuration.Display.Alpha
+		color.R, color.G, color.B, color.A
 	);
 end
 
@@ -268,6 +267,10 @@ end
 
 function FuryMonitor.AbilityFrame:GetParentFrame()
 	return self._parent;
+end
+
+function FuryMonitor.AbilityFrame:GetDamageTextFrame()
+	return self._damageTextFrame;
 end
 
 function FuryMonitor.AbilityFrame:GetUseId()

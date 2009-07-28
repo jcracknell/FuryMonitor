@@ -15,7 +15,7 @@ FuryMonitor.Localization.Locales = {
 	
 		-- Weapon types
 		["Two-Handed"] =						"Two-Handed",
-		["One-handed"] =						"One-handed",
+		["One-Handed"] =						"One-Handed",
 		["Dagger"] =							"Dagger",
 	
 		-- Talents
@@ -44,7 +44,7 @@ FuryMonitor.Localization.Locales = {
 	
 		-- Weapon types
 		["Two-Handed"] =						"Zweihand",
-		["One-handed"] =						"Einhand",
+		["One-Handed"] =						"Einhand",
 		["Dagger"] =							"Dolch",
 	
 		-- Talents

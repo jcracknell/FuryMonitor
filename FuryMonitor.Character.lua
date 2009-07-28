@@ -80,7 +80,7 @@ function FuryMonitor.Character:GetMainHandNormalizedSpeed()
 	if FuryMonitor.Util.str_contains(weaponType, L("Two-Handed")) then
 		return 3.3;
 	end
-	if FuryMonitor.Util.str_contains(weaponType, L("One-handed")) then
+	if FuryMonitor.Util.str_contains(weaponType, L("One-Handed")) then
 		return 2.4;
 	end
 	if FuryMonitor.Util.str_contains(weaponType, L("Dagger")) then
